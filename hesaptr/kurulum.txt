@@ -1,7 +1,0 @@
-Scriptte kurulum sihirbazı mevcuttur,
-
-Adım 1- mysql veritabanı sihirbazı üzerinden veritabanı, kullanıcısı ve şifresi oluşturun
-Adım 2- siteadresi.com/install açıp kurulum bilgilerini girin.
-
-Satışı dağıtımı yasaktır, Tüm hakları tituweb.net ve R10.net Recep 'e Aittir.
-İyi kullanımlar dileriz.
