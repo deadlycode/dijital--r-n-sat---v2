@@ -133,4 +133,24 @@ $lang['siteLogo'] = 'Site Logo';
 $lang['siteFavicon'] = 'Site Favicon (Square)';
 $lang['showLogo'] = 'Show Logo?';
 $lang['callbackUrlText'] = '<b class="font-bold">Callback Url:</b> %s';
+
+// Added for Product Attributes and File Uploads - Admin
+$lang['productAttributes'] = 'Product Attributes';
+$lang['addAttribute'] = 'Add Attribute';
+$lang['attributeNamePlaceholder'] = 'Attribute Name';
+$lang['attributeValuePlaceholder'] = 'Attribute Value';
+$lang['removeAttributeBtn'] = 'Remove';
+$lang['productFiles'] = 'Product Files';
+$lang['uploadNewFiles'] = 'Upload New Files';
+$lang['currentFiles'] = 'Current Files';
+$lang['deleteFileBtn'] = 'Delete File';
+$lang['noFilesUploaded'] = 'No files uploaded yet.';
+$lang['chooseFiles'] = 'Choose files...';
+$lang['multipleFilesAllowed'] = 'You can upload multiple files.';
+$lang['fileDeleteSuccess'] = 'File deleted successfully.';
+$lang['fileDeleteFailed'] = 'Failed to delete file.';
+$lang['invalidRequest'] = 'Invalid request.';
+$lang['errorOccurred'] = 'An error occurred. Please try again.';
+$lang['deleteFileConfirm'] = 'Are you sure you want to delete this file?';
+
 ?>

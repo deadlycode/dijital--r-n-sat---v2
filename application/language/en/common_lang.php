@@ -41,4 +41,5 @@ $lang['pleaseWait'] = 'Please wait...';
 $lang['piece'] = '%s Pieces';
 $lang['submit'] = 'Submit';
 $lang['close'] = 'Close';
+$lang['browse'] = 'Browse'; // For custom file input
 ?>

@@ -133,4 +133,49 @@ class Home extends CI_Controller {
 			</urlset>
 		<?php
 	}
+
+	public function download_file($file_id = 0) {
+		if (!$file_id) {
+			show_404();
+			return;
+		}
+
+		// Load Admin_Model to get file details.
+		// Consider if this model is appropriate here or if a method in Home_Model/Panel_Model is better.
+		// For now, using Admin_Model as getProductFile is already there.
+		$this->load->model('Admin_Model');
+		$file_info = $this->Admin_Model->getProductFile($file_id);
+
+		if (!$file_info) {
+			show_404();
+			return;
+		}
+
+		// Authorization check:
+		// For now, we assume if they can see the product, they can download.
+		// Future enhancement: Check if the product is purchased by the logged-in user if files are private.
+		// Example:
+		// if ($this->session->has_userdata('user')) {
+		//    $user_id = $this->session->userdata('user');
+		//    // $product_id = $file_info['account_id'];
+		//    // Check if user_id has purchased product_id
+		//    // If not, show error or redirect.
+		// } else {
+		//    // Or if files are only for logged-in users
+		//    // redirect('login');
+		// }
+
+
+		$file_path = FCPATH . 'assets/uploads/product_files/' . $file_info['stored_file_name'];
+
+		if (!file_exists($file_path)) {
+			log_message('error', 'File not found for download: ' . $file_path);
+			show_404();
+			return;
+		}
+
+		$this->load->helper('download');
+		$data = file_get_contents($file_path); // Read the file's contents
+		force_download($file_info['file_name'], $data);
+	}
 }

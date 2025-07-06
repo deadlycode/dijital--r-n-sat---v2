@@ -100,8 +100,20 @@ class Panel_Model extends CI_Model {
     }
     public function getAccounts($id, $limit, $start) {
         $this->db->limit($limit, $start);
-        $data = $this->db->order_by('id','desc')->get_where("accounts", array("category" => $id, "user" => 0))->result_array();
-        return count($data) > 0 ? $data : false;
+        $accounts = $this->db->order_by('id','desc')->get_where("accounts", array("category" => $id, "user" => 0))->result_array();
+
+        if ($accounts) {
+            for ($i = 0; $i < count($accounts); $i++) {
+                // Fetch attributes
+                $attributes = $this->db->get_where('product_attributes', array('account_id' => $accounts[$i]['id']))->result_array();
+                $accounts[$i]['attributes'] = $attributes ? $attributes : array();
+
+                // Fetch files
+                $files = $this->db->get_where('product_files', array('account_id' => $accounts[$i]['id']))->result_array();
+                $accounts[$i]['files'] = $files ? $files : array();
+            }
+        }
+        return $accounts ? $accounts : false;
     }
     public function getBankAccounts() {
         $data = $this->db->order_by('id','desc')->get("banks")->result_array();

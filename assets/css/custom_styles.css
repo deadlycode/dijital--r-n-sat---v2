@@ -1,0 +1,121 @@
+/* Custom styles to enhance the modern look and feel */
+
+body {
+    color: #555; /* Darker base text color for better readability */
+    font-size: 1rem; /* Standard base font size */
+    line-height: 1.6; /* Improved line spacing for text */
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700; /* Montserrat bold for headings */
+}
+
+.navbar-brand img {
+    max-height: 40px; /* Slightly adjust navbar logo size if needed */
+}
+
+/* Card styling improvements */
+.card {
+    border: 1px solid #e0e0e0; /* Softer border for cards */
+    transition: box-shadow 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+}
+
+.card .card-img-top {
+    width: 100%;
+    height: 200px; /* Consistent height for card images */
+    object-fit: cover; /* Cover ensures image fills the space without distortion */
+}
+
+.card-title {
+    font-weight: 600; /* Semi-bold for card titles */
+}
+
+/* Button enhancements */
+.btn {
+    border-radius: 0.25rem; /* Standard border radius */
+    font-weight: 500;
+    padding: 0.6rem 1.2rem;
+}
+
+.btn-primary {
+    background-color: #007bff; /* A more standard Bootstrap primary blue */
+    border-color: #007bff;
+}
+.btn-primary:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+}
+
+.btn-danger {
+    background-color: #dc3545; /* Standard Bootstrap danger red */
+    border-color: #dc3545;
+}
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+.btn-info {
+     background-color: #17a2b8; /* Standard Bootstrap info cyan */
+     border-color: #17a2b8;
+}
+.btn-info:hover {
+    background-color: #138496;
+    border-color: #117a8b;
+}
+
+
+/* Table styling on category page */
+.table th, .table td {
+    vertical-align: middle; /* Align text vertically in table cells */
+}
+
+/* Details Modal in category.php */
+#detailsModal .modal-body h5 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    color: #333;
+}
+#detailsModal .modal-body h5:first-child {
+    margin-top: 0;
+}
+#detailsModal .modal-body p,
+#detailsModal .modal-body ul {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+#detailsModal .modal-body ul.list-group li,
+#detailsModal .modal-body ul.list-unstyled li {
+    padding: 0.3rem 0;
+}
+#detailsModal .modal-body a {
+    color: #007bff;
+}
+#detailsModal .modal-body a:hover {
+    text-decoration: underline;
+}
+
+/* Ensure admin forms are also slightly improved by global body styles if applicable */
+/* Admin panel specific styles could go here if needed */
+
+/* Fix for potential horizontal scroll on small screens if Bootstrap grid isn't containing something */
+.container, .container-fluid {
+    max-width: 100%;
+    overflow-x: hidden; /* Prevent containers themselves from causing scroll, content within should be responsive */
+}
+
+/* Custom file input label to show selection */
+.custom-file-label::after {
+    content: "<?php echo lang('browse', 'Browse'); ?>"; /* Needs lang string */
+}
+
+/* Responsive table for admin sections if not already wrapped */
+.table-responsive table {
+   min-width: 600px; /* Example: ensure table has a min-width if it tends to break layout */
+}

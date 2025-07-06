@@ -17,7 +17,54 @@ class AdminAjax extends CI_Controller {
 			redirect(base_url('login'));
 			exit;
 		}
+
+		// Ensure product_files directory exists
+		$upload_path = FCPATH . 'assets/uploads/product_files/';
+		if (!is_dir($upload_path)) {
+			mkdir($upload_path, 0755, true); // Create recursively with appropriate permissions
+            // Add a .htaccess file to deny direct access
+            $htaccess_content = "Deny from all";
+            @file_put_contents($upload_path . '.htaccess', $htaccess_content);
+		}
 	}
+
+	private function _handle_file_uploads($account_id, $files_input_name = 'product_files') {
+		if (isset($_FILES[$files_input_name]) && !empty($_FILES[$files_input_name]['name'][0])) {
+			$this->load->library('upload');
+			$upload_path = FCPATH . 'assets/uploads/product_files/';
+
+			$files = $_FILES[$files_input_name];
+			$file_count = count($files['name']);
+
+			for ($i = 0; $i < $file_count; $i++) {
+				if ($files['error'][$i] == UPLOAD_ERR_OK) {
+					$_FILES['userfile']['name']     = $files['name'][$i];
+					$_FILES['userfile']['type']     = $files['type'][$i];
+					$_FILES['userfile']['tmp_name'] = $files['tmp_name'][$i];
+					$_FILES['userfile']['error']    = $files['error'][$i];
+					$_FILES['userfile']['size']     = $files['size'][$i];
+
+					$original_name = $_FILES['userfile']['name'];
+					$stored_file_name = uniqid() . '_' . preg_replace("/[^a-zA-Z0-9\._-]/", "_", $original_name);
+
+					$config['upload_path'] = $upload_path;
+					$config['allowed_types'] = '*'; // Allow all types for now, can be restricted
+					$config['file_name'] = $stored_file_name;
+					$config['max_size'] = '20480'; // 20MB, can be configured
+
+					$this->upload->initialize($config);
+
+					if ($this->upload->do_upload('userfile')) {
+						$this->Admin_Model->insertProductFile($account_id, $original_name, $stored_file_name);
+					} else {
+						// Optionally log upload errors: $this->upload->display_errors();
+						// Continue to next file if one fails
+					}
+				}
+			}
+		}
+	}
+
 	public function approve_payment() {
 		$this->lang->load(array('common', 'admin'), $this->config->item('site_lang'));
 		if(!empty($this->input->post('id'))) {
@@ -94,7 +141,30 @@ class AdminAjax extends CI_Controller {
 	function add_account() {
 		$this->lang->load(array('common', 'admin'), $this->config->item('site_lang'));
 		if(!empty($this->input->post('category'))) {
-			$id = $this->Admin_Model->insertAccount($this->input->post('category'), $this->input->post('date'), $this->input->post('days'), $this->input->post('verified'), $this->input->post('email'), $this->input->post('password'), $this->input->post('price'), $this->input->post('details'));
+			// Prepare attributes data
+			$attribute_names = $this->input->post('attribute_names');
+			$attribute_values = $this->input->post('attribute_values');
+			$attributes_data = array();
+			if (!empty($attribute_names) && !empty($attribute_values) && count($attribute_names) == count($attribute_values)) {
+				$attributes_data['names'] = $attribute_names;
+				$attributes_data['values'] = $attribute_values;
+			}
+
+			$account_id = $this->Admin_Model->insertAccount(
+				$this->input->post('category'),
+				$this->input->post('date'),
+				$this->input->post('days'),
+				$this->input->post('verified'),
+				$this->input->post('email'),
+				$this->input->post('password'),
+				$this->input->post('price'),
+				$this->input->post('details'),
+				$attributes_data
+			);
+
+			if ($account_id) {
+				$this->_handle_file_uploads($account_id, 'product_files');
+			}
 
 			$this->output->set_content_type('application/json')->set_output(json_encode(array('success' => true, 'message' => lang('addAccountSuccess'))));
 		}
@@ -105,7 +175,30 @@ class AdminAjax extends CI_Controller {
 	function edit_account() {
 		$this->lang->load(array('common', 'admin'), $this->config->item('site_lang'));
 		if(!empty($this->input->post('category')) && !empty($this->input->post('id'))) {
-			$id = $this->Admin_Model->updateAccount($this->input->post('id'), $this->input->post('category'), $this->input->post('date'), $this->input->post('days'), $this->input->post('verified'), $this->input->post('email'), $this->input->post('password'), $this->input->post('price'), $this->input->post('details'));
+			$account_id = $this->input->post('id');
+			// Prepare attributes data
+			$attribute_names = $this->input->post('attribute_names');
+			$attribute_values = $this->input->post('attribute_values');
+			$attributes_data = array();
+			if (!empty($attribute_names) && !empty($attribute_values) && count($attribute_names) == count($attribute_values)) {
+				$attributes_data['names'] = $attribute_names;
+				$attributes_data['values'] = $attribute_values;
+			}
+
+			$this->Admin_Model->updateAccount(
+				$account_id,
+				$this->input->post('category'),
+				$this->input->post('date'),
+				$this->input->post('days'),
+				$this->input->post('verified'),
+				$this->input->post('email'),
+				$this->input->post('password'),
+				$this->input->post('price'),
+				$this->input->post('details'),
+				$attributes_data
+			);
+
+			$this->_handle_file_uploads($account_id, 'product_files');
 
 			$this->output->set_content_type('application/json')->set_output(json_encode(array('success' => true, 'message' => lang('editAccountSuccess'))));
 		}
@@ -302,5 +395,24 @@ class AdminAjax extends CI_Controller {
 			}
 		}
 		$this->output->set_content_type('application/json')->set_output(json_encode(array('success' => true, 'message' => lang('updateSettingsSuccess'))));
+	}
+
+	public function delete_product_file() {
+		$this->lang->load(array('common', 'admin'), $this->config->item('site_lang'));
+		$file_id = $this->input->post('file_id');
+
+		if (empty($file_id)) {
+			$this->output->set_content_type('application/json')->set_output(json_encode(array('success' => false, 'message' => lang('invalidRequest')))); // Needs lang string
+			return;
+		}
+
+		// Optional: Add ownership check here to ensure the user/admin is allowed to delete this file
+		// For now, assuming admin can delete any product file.
+
+		if ($this->Admin_Model->deleteProductFile($file_id)) {
+			$this->output->set_content_type('application/json')->set_output(json_encode(array('success' => true, 'message' => lang('fileDeleteSuccess')))); // Needs lang string
+		} else {
+			$this->output->set_content_type('application/json')->set_output(json_encode(array('success' => false, 'message' => lang('fileDeleteFailed')))); // Needs lang string
+		}
 	}
 }

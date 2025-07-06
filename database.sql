@@ -362,6 +362,50 @@ ALTER TABLE `ticket_messages`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `product_attributes`
+--
+
+CREATE TABLE `product_attributes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `account_id` int(11) NOT NULL,
+  `attribute_name` varchar(255) NOT NULL,
+  `attribute_value` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `account_id` (`account_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Tablo için kısıtlamalar `product_attributes`
+--
+ALTER TABLE `product_attributes`
+  ADD CONSTRAINT `fk_product_attributes_account_id` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `product_files`
+--
+
+CREATE TABLE `product_files` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `account_id` int(11) NOT NULL,
+  `file_name` varchar(255) NOT NULL,
+  `stored_file_name` varchar(255) NOT NULL,
+  `upload_date` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `account_id` (`account_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Tablo için kısıtlamalar `product_files`
+--
+ALTER TABLE `product_files`
+  ADD CONSTRAINT `fk_product_files_account_id` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

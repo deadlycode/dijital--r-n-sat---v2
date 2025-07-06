@@ -77,4 +77,10 @@ $lang['passwordTooShort'] = 'Password must be minimum 6 characters length.';
 $lang['noPaymentNotifications'] = 'You have never sent a payment notification.';
 $lang['stockErrorText'] = '%s pieces accounts in stock!';
 $lang['stockText'] = '%s adet hesabı %s %s\'e satın almak istediğinizden emin misiniz?';
+
+// Added for product details modal on category page
+$lang['additionalAttributes'] = 'Additional Attributes';
+$lang['downloadableFiles'] = 'Downloadable Files';
+$lang['noDetailsAvailable'] = 'No details available for this product.';
+
 ?>

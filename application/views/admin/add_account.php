@@ -73,6 +73,28 @@
         <textarea name="details" style="height:100px" class="form-control" placeholder="<?php echo lang("accountDetailsText"); ?>"></textarea>
       </div>
     </div>
+
+    <div class="row mt-3">
+      <div class="col-md-12">
+        <h5 class="text-secondary"><?php echo lang("productAttributes"); // Needs new lang string ?>:</h5>
+        <div id="product-attributes-container">
+          <!-- Attribute fields will be added here by JavaScript -->
+        </div>
+        <button type="button" class="btn btn-info btn-sm mt-2" id="add-attribute-btn"><?php echo lang("addAttribute"); // Needs new lang string ?></button>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-md-12">
+        <h5 class="text-secondary"><?php echo lang("productFiles", "Product Files"); // Needs new lang string ?>:</h5>
+        <div class="custom-file">
+          <input type="file" class="custom-file-input" id="product_files" name="product_files[]" multiple>
+          <label class="custom-file-label" for="product_files"><?php echo lang("chooseFiles", "Choose files..."); // Needs new lang string ?></label>
+        </div>
+        <small class="form-text text-muted"><?php echo lang("multipleFilesAllowed", "You can upload multiple files."); // Needs new lang string ?></small>
+      </div>
+    </div>
+
     <button id="submitBtn" type="submit" class="btn btn-primary mt-3"><?php echo lang("submit"); ?></button>
     </form>
   </div>
@@ -136,4 +158,66 @@
 </div>
     </div>
   </div>
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const attributesContainer = document.getElementById('product-attributes-container');
+    const addAttributeBtn = document.getElementById('add-attribute-btn');
+
+    if (addAttributeBtn) {
+      addAttributeBtn.addEventListener('click', function() {
+        const attributeRow = document.createElement('div');
+        attributeRow.classList.add('row', 'mt-2', 'attribute-row');
+
+        const nameCol = document.createElement('div');
+        nameCol.classList.add('col-md-5');
+        const nameInput = document.createElement('input');
+        nameInput.setAttribute('type', 'text');
+        nameInput.setAttribute('name', 'attribute_names[]');
+        nameInput.setAttribute('class', 'form-control form-control-sm');
+        nameInput.setAttribute('placeholder', '<?php echo lang("attributeNamePlaceholder", "Attribute Name"); ?>'); // Placeholder for lang string
+        nameCol.appendChild(nameInput);
+
+        const valueCol = document.createElement('div');
+        valueCol.classList.add('col-md-5');
+        const valueInput = document.createElement('input');
+        valueInput.setAttribute('type', 'text');
+        valueInput.setAttribute('name', 'attribute_values[]');
+        valueInput.setAttribute('class', 'form-control form-control-sm');
+        valueInput.setAttribute('placeholder', '<?php echo lang("attributeValuePlaceholder", "Attribute Value"); ?>'); // Placeholder for lang string
+        valueCol.appendChild(valueInput);
+
+        const removeCol = document.createElement('div');
+        removeCol.classList.add('col-md-2');
+        const removeButton = document.createElement('button');
+        removeButton.setAttribute('type', 'button');
+        removeButton.classList.add('btn', 'btn-danger', 'btn-sm', 'remove-attribute-btn');
+        removeButton.textContent = '<?php echo lang("removeAttributeBtn", "Remove"); ?>'; // Placeholder for lang string
+        removeButton.addEventListener('click', function() {
+          attributeRow.remove();
+        });
+        removeCol.appendChild(removeButton);
+
+        attributeRow.appendChild(nameCol);
+        attributeRow.appendChild(valueCol);
+        attributeRow.appendChild(removeCol);
+        attributesContainer.appendChild(attributeRow);
+      });
+    }
+
+    // Custom file input label updater for add_account.php
+    const fileInput = document.getElementById('product_files');
+    if (fileInput) {
+      fileInput.addEventListener('change', function(e) {
+        let fileNames = [];
+        for (let i = 0; i < e.target.files.length; i++) {
+          fileNames.push(e.target.files[i].name);
+        }
+        const nextSibling = e.target.nextElementSibling;
+        if (nextSibling && nextSibling.classList.contains('custom-file-label')) {
+          nextSibling.innerText = fileNames.join(', ') || '<?php echo lang("chooseFiles", "Choose files..."); ?>';
+        }
+      });
+    }
+  });
+  </script>
   <script src="assets/js/ajaxform.js"></script>

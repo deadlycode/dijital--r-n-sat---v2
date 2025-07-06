@@ -41,4 +41,5 @@ $lang['pleaseWait'] = 'Lütfen bekleyin...';
 $lang['piece'] = '%s Adet';
 $lang['submit'] = 'Gönder';
 $lang['close'] = 'Kapat';
+$lang['browse'] = 'Gözat'; // For custom file input (Turkish)
 ?>

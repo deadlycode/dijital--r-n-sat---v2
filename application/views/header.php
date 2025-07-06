@@ -15,6 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="assets/css/theme.min.css">
+  <link rel="stylesheet" href="assets/css/custom_styles.css"> <!-- Custom styles -->
   <link rel="stylesheet" href="assets/css/aos.min.css">
   <link rel="stylesheet" href="assets/css/toastr.min.css">
   <link rel="stylesheet" href="assets/fontawesome/css/all.min.css">

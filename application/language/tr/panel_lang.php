@@ -78,4 +78,10 @@ $lang['passwordTooShort'] = 'Parolanız minimum 6 karakter uzunluğunda olmalıd
 $lang['noPaymentNotifications'] = 'Hiç ödeme bildirimi göndermemişsiniz.';
 $lang['stockErrorText'] = 'Stokta %s adet Dijital Ürünler var!';
 $lang['stockText'] = '%s adet hesabı %s %s\'e satın almak istediğinizden emin misiniz?';
+
+// Added for product details modal on category page (Turkish)
+$lang['additionalAttributes'] = 'Ek Özellikler';
+$lang['downloadableFiles'] = 'İndirilebilir Dosyalar';
+$lang['noDetailsAvailable'] = 'Bu ürün için detay mevcut değil.';
+
 ?>

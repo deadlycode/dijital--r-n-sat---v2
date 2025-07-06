@@ -38,7 +38,15 @@
                     <td><?php echo $result["days"] == 0 ? lang("limitless") : $result["days"]; ?></td>
                     <td><?php echo $result["verified"] == 1 ? lang("yes") : lang("no"); ?></td>
                     <td><?php echo $result["price"]; ?> <?php echo $this->config->item("site_money_sign"); ?></td>
-                    <td><button onclick="showDetails('<?php echo rawurlencode($result["details"]); ?>')" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" title="<?php echo lang("details"); ?>"><i class="fas fa-eye"></i></button> <button class="btn btn-danger btn-sm" onclick="buyAccount(<?php echo $result["id"]; ?>,<?php echo $result["price"]; ?>)"><i class="fas fa-check mr-2"></i><?php echo lang("buy"); ?></button></td>
+                    <?php
+                        // Prepare data for showDetails. Attributes and files are already fetched by Panel_Model->getAccounts()
+                        $details_data = array(
+                            'details' => $result["details"],
+                            'attributes' => isset($result['attributes']) ? $result['attributes'] : array(),
+                            'files' => isset($result['files']) ? $result['files'] : array()
+                        );
+                    ?>
+                    <td><button onclick='showDetails(<?php echo json_encode($details_data, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES); ?>)' class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" title="<?php echo lang("details"); ?>"><i class="fas fa-eye"></i></button> <button class="btn btn-danger btn-sm" onclick="buyAccount(<?php echo $result["id"]; ?>,<?php echo $result["price"]; ?>)"><i class="fas fa-check mr-2"></i><?php echo lang("buy"); ?></button></td>
                     </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -108,10 +116,52 @@
   <script>
 
   var confirmButtonText = $("#confirmButton").text();
-  function showDetails(details) {
-    $("#detailsModal p").html(decodeURIComponent(details));
+  function showDetails(data) {
+    let modalBody = $("#detailsModal .modal-body");
+    modalBody.empty(); // Clear previous content
+
+    // Main Details
+    if (data.details) {
+      modalBody.append('<h5><?php echo lang("details", "Details"); ?></h5><p>' + data.details + '</p>'); // data.details is already nl2br'd from model
+    }
+
+    // Attributes
+    if (data.attributes && data.attributes.length > 0) {
+      let attributesHtml = '<h5 class="mt-3"><?php echo lang("additionalAttributes", "Additional Attributes"); ?></h5><ul class="list-unstyled">';
+      data.attributes.forEach(function(attr) {
+        attributesHtml += '<li><strong>' + escapeHtml(attr.attribute_name) + ':</strong> ' + escapeHtml(attr.attribute_value) + '</li>';
+      });
+      attributesHtml += '</ul>';
+      modalBody.append(attributesHtml);
+    }
+
+    // Files
+    if (data.files && data.files.length > 0) {
+      let filesHtml = '<h5 class="mt-3"><?php echo lang("downloadableFiles", "Downloadable Files"); ?></h5><ul class="list-group">';
+      data.files.forEach(function(file) {
+        // IMPORTANT: Create a proper download link via a controller method
+        filesHtml += '<li class="list-group-item"><a href="./home/download_file/' + file.id + '" target="_blank">' + escapeHtml(file.file_name) + '</a></li>';
+      });
+      filesHtml += '</ul>';
+      modalBody.append(filesHtml);
+    }
+
+    if (modalBody.html().trim() === "") {
+        modalBody.html('<p><?php echo lang("noDetailsAvailable", "No details available for this product."); ?></p>');
+    }
+
     $("#detailsModal").modal("show");
   }
+
+  function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+ }
+
   $("#confirmButton").click(function() {
     $("#confirmButton").text($("#confirmButton").data("wait"));
     $("#confirmButton").attr("disabled", "disabled");

@@ -135,4 +135,24 @@ $lang['siteLogo'] = 'Site Logosu';
 $lang['siteFavicon'] = 'Site Faviconu (Kare)';
 $lang['showLogo'] = 'Logo Gözüksün Mü?';
 $lang['callbackUrlText'] = '<b class="font-bold">Geri Dönüş Url Adresi:</b> %s';
+
+// Added for Product Attributes and File Uploads - Admin (Turkish)
+$lang['productAttributes'] = 'Ürün Özellikleri';
+$lang['addAttribute'] = 'Özellik Ekle';
+$lang['attributeNamePlaceholder'] = 'Özellik Adı';
+$lang['attributeValuePlaceholder'] = 'Özellik Değeri';
+$lang['removeAttributeBtn'] = 'Kaldır';
+$lang['productFiles'] = 'Ürün Dosyaları';
+$lang['uploadNewFiles'] = 'Yeni Dosya Yükle';
+$lang['currentFiles'] = 'Mevcut Dosyalar';
+$lang['deleteFileBtn'] = 'Dosyayı Sil';
+$lang['noFilesUploaded'] = 'Henüz dosya yüklenmedi.';
+$lang['chooseFiles'] = 'Dosya seçin...';
+$lang['multipleFilesAllowed'] = 'Birden fazla dosya yükleyebilirsiniz.';
+$lang['fileDeleteSuccess'] = 'Dosya başarıyla silindi.';
+$lang['fileDeleteFailed'] = 'Dosya silinemedi.';
+$lang['invalidRequest'] = 'Geçersiz istek.';
+$lang['errorOccurred'] = 'Bir hata oluştu. Lütfen tekrar deneyin.';
+$lang['deleteFileConfirm'] = 'Bu dosyayı silmek istediğinizden emin misiniz?';
+
 ?>

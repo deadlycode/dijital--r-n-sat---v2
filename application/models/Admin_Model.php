@@ -17,8 +17,15 @@ class Admin_Model extends CI_Model {
         return count($d) > 0 ? $d[0] : null;
     }
     public function getAccount($id) {
-        $d = $this->db->get_where('accounts', array('id' => $id))->result_array();
-        return count($d) > 0 ? $d[0] : null;
+        $account = $this->db->get_where('accounts', array('id' => $id))->row_array();
+        if ($account) {
+            $attributes = $this->db->get_where('product_attributes', array('account_id' => $id))->result_array();
+            $account['attributes'] = $attributes;
+
+            $files = $this->db->get_where('product_files', array('account_id' => $id))->result_array();
+            $account['files'] = $files;
+        }
+        return $account;
     }
     public function getBankAccount($id) {
         $d = $this->db->get_where('banks', array('id' => $id))->result_array();
@@ -95,7 +102,7 @@ class Admin_Model extends CI_Model {
         ));
         return $this->db->insert_id();
     }
-    public function insertAccount($category, $date, $days, $verified, $email, $password, $price, $details) {
+    public function insertAccount($category, $date, $days, $verified, $email, $password, $price, $details, $attributes_data = array()) {
         $this->db->insert('accounts', array(
             'created_date' => strtotime($date),
             'days' => $days,
@@ -108,7 +115,26 @@ class Admin_Model extends CI_Model {
             'user' => 0,
             'bought_date' => 0
         ));
-        return $this->db->insert_id();
+        $account_id = $this->db->insert_id();
+
+        if ($account_id && isset($attributes_data['names']) && isset($attributes_data['values']) && is_array($attributes_data['names']) && is_array($attributes_data['values'])) {
+            $names = $attributes_data['names'];
+            $values = $attributes_data['values'];
+            $count = count($names);
+
+            for ($i = 0; $i < $count; $i++) {
+                $name = trim($names[$i]);
+                $value = trim($values[$i]);
+                if (!empty($name) && !empty($value)) {
+                    $this->db->insert('product_attributes', array(
+                        'account_id' => $account_id,
+                        'attribute_name' => strip_tags($name),
+                        'attribute_value' => strip_tags($value)
+                    ));
+                }
+            }
+        }
+        return $account_id;
     }
     public function insertBankAccount($bank_name, $name, $number) {
         $this->db->insert('banks', array(
@@ -118,7 +144,7 @@ class Admin_Model extends CI_Model {
         ));
         return $this->db->insert_id();
     }
-    public function updateAccount($id, $category, $date, $days, $verified, $email, $password, $price, $details) {
+    public function updateAccount($id, $category, $date, $days, $verified, $email, $password, $price, $details, $attributes_data = array()) {
         $this->db->where('id', $id)->update('accounts', array(
             'created_date' => strtotime($date),
             'days' => $days,
@@ -129,6 +155,28 @@ class Admin_Model extends CI_Model {
             'category' => $category,
             'price' => $price,
         ));
+
+        // Delete existing attributes for this account
+        $this->db->where('account_id', $id)->delete('product_attributes');
+
+        // Insert new product attributes if provided
+        if (isset($attributes_data['names']) && isset($attributes_data['values']) && is_array($attributes_data['names']) && is_array($attributes_data['values'])) {
+            $names = $attributes_data['names'];
+            $values = $attributes_data['values'];
+            $count = count($names);
+
+            for ($i = 0; $i < $count; $i++) {
+                $name = trim($names[$i]);
+                $value = trim($values[$i]);
+                if (!empty($name) && !empty($value)) {
+                    $this->db->insert('product_attributes', array(
+                        'account_id' => $id, // Use the current account ID
+                        'attribute_name' => strip_tags($name),
+                        'attribute_value' => strip_tags($value)
+                    ));
+                }
+            }
+        }
     }
     public function updateUser($id, $name, $email, $password, $balance, $role) {
         if(!empty($password)) {
@@ -157,8 +205,47 @@ class Admin_Model extends CI_Model {
         $this->db->where('id', $id)->delete('categories');
     }
     public function deleteAccount($id) {
+        // First, get all files associated with this account to delete them from server
+        $files_to_delete = $this->db->get_where('product_files', array('account_id' => $id))->result_array();
+        if ($files_to_delete) {
+            foreach ($files_to_delete as $file_info) {
+                $file_path = FCPATH . 'assets/uploads/product_files/' . $file_info['stored_file_name'];
+                if (file_exists($file_path)) {
+                    @unlink($file_path);
+                }
+            }
+        }
+        // ON DELETE CASCADE will handle product_attributes and product_files table entries
         $this->db->where('id', $id)->delete('accounts');
     }
+
+    public function insertProductFile($account_id, $file_name, $stored_file_name) {
+        $this->db->insert('product_files', array(
+            'account_id' => $account_id,
+            'file_name' => $file_name,
+            'stored_file_name' => $stored_file_name,
+            'upload_date' => time()
+        ));
+        return $this->db->insert_id();
+    }
+
+    public function getProductFile($file_id) {
+        return $this->db->get_where('product_files', array('id' => $file_id))->row_array();
+    }
+
+    public function deleteProductFile($file_id) {
+        $file_info = $this->getProductFile($file_id);
+        if ($file_info) {
+            $file_path = FCPATH . 'assets/uploads/product_files/' . $file_info['stored_file_name'];
+            if (file_exists($file_path)) {
+                @unlink($file_path);
+            }
+            $this->db->where('id', $file_id)->delete('product_files');
+            return true;
+        }
+        return false;
+    }
+
     public function deleteUser($id) {
         $this->db->where('user', $id)->delete('tickets');
         $this->db->where('user', $id)->delete('payments');
